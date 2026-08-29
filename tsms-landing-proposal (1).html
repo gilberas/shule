@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSMS — Every student, every day, on record.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF3E4;
+    --paper-line:#E4D7B0;
+    --ink:#1B2A20;
+    --board:#1F3A2C;
+    --board-2:#254432;
+    --gold:#D9A441;
+    --gold-bright:#EFC873;
+    --clay:#A8462A;
+    --teal:#1F6E63;
+    --cream:#F4ECD8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; letter-spacing:-0.01em;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block; max-width:100%;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2px solid var(--clay); outline-offset:3px;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(31,58,44,0.96);
+    backdrop-filter:blur(6px);
+    color:var(--cream);
+    border-bottom:1px solid rgba(217,164,65,0.25);
+  }
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; height:68px;}
+  .brand{display:flex; align-items:center; gap:10px; font-family:'Fraunces',serif; font-weight:700; font-size:1.2rem; color:var(--cream);}
+  .brand-mark{
+    width:30px; height:30px; border-radius:6px;
+    background:linear-gradient(135deg,var(--gold),var(--clay));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:0.75rem; color:var(--board);
+  }
+  .nav-links{display:flex; align-items:center; gap:32px; font-size:0.92rem;}
+  .nav-links a{opacity:0.85; transition:opacity .15s;}
+  .nav-links a:hover{opacity:1;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 20px; border-radius:3px; border:1.5px solid transparent;
+    font-weight:600; font-size:0.9rem; cursor:pointer; transition:all .15s;
+  }
+  .btn-gold{background:var(--gold); color:var(--board);}
+  .btn-gold:hover{background:var(--gold-bright);}
+  .btn-outline{border-color:rgba(244,236,216,0.4); color:var(--cream); background:transparent;}
+  .btn-outline:hover{border-color:var(--cream);}
+  .btn-clay{background:var(--clay); color:var(--cream);}
+  .btn-clay:hover{background:#c0562f;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:
+      repeating-linear-gradient(180deg, rgba(217,164,65,0.045) 0 1px, transparent 1px 44px),
+      radial-gradient(ellipse at 15% -10%, var(--board-2), var(--board) 60%);
+    color:var(--cream);
+    padding:88px 0 100px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;}
+  @media (max-width:900px){ .hero-grid{grid-template-columns:1fr;} }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.12em;
+    font-size:0.72rem; color:var(--gold-bright); margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:''; width:22px; height:1px; background:var(--gold-bright);}
+  .hero h1{
+    font-size:clamp(2.3rem, 4.6vw, 3.6rem);
+    font-weight:700; line-height:1.06; color:var(--cream);
+    max-width:12ch;
+  }
+  .hero h1 em{font-style:italic; color:var(--gold-bright); font-weight:600;}
+  .hero p.lead{
+    margin-top:22px; font-size:1.08rem; color:rgba(244,236,216,0.8); max-width:44ch;
+  }
+  .hero-ctas{display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;}
+  .hero-note{margin-top:22px; font-size:0.82rem; color:rgba(244,236,216,0.55); font-family:'IBM Plex Mono',monospace;}
+
+  /* Register card — the signature element */
+  .register-card{
+    background:var(--cream);
+    color:var(--ink);
+    border-radius:6px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.45), 0 0 0 1px rgba(217,164,65,0.3);
+    overflow:hidden;
+    transform:rotate(1.2deg);
+  }
+  .register-head{
+    background:var(--board);
+    color:var(--gold-bright);
+    padding:14px 20px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.76rem;
+    display:flex; justify-content:space-between; align-items:center;
+    letter-spacing:0.03em;
+  }
+  .register-head span:last-child{color:rgba(244,236,216,0.55);}
+  .register-list{padding:6px 6px 14px;}
+  .reg-row{
+    display:flex; align-items:center; gap:12px;
+    padding:11px 16px; border-bottom:1px dashed var(--paper-line);
+    opacity:0.35;
+  }
+  .reg-row:last-child{border-bottom:none;}
+  .reg-check{
+    width:20px; height:20px; border-radius:50%; border:1.5px solid var(--board);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:0.65rem; color:transparent; transition:all .25s ease;
+  }
+  .reg-name{font-size:0.94rem; font-weight:500; flex:1;}
+  .reg-status{
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem;
+    color:var(--paper-line); text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .reg-row.present{opacity:1;}
+  .reg-row.present .reg-check{background:var(--teal); border-color:var(--teal); color:var(--cream);}
+  .reg-row.present .reg-status{color:var(--teal); font-weight:600;}
+  .register-foot{
+    padding:12px 20px; border-top:1px solid var(--paper-line);
+    display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:#8a7f5f;
+  }
+
+  /* ---------- LADDER (real sequence, so numbering is justified) ---------- */
+  .ladder{padding:96px 0 40px;}
+  .section-head{max-width:56ch; margin-bottom:52px;}
+  .section-head .eyebrow{color:var(--clay);}
+  .section-head .eyebrow::before{background:var(--clay);}
+  .section-head h2{font-size:clamp(1.7rem,3vw,2.3rem); font-weight:600;}
+  .ladder-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--paper-line); border-radius:4px; overflow:hidden;}
+  @media (max-width:760px){ .ladder-grid{grid-template-columns:1fr;} }
+  .ladder-step{
+    padding:34px 28px; border-right:1px solid var(--paper-line); position:relative;
+    background:var(--paper);
+  }
+  .ladder-step:last-child{border-right:none;}
+  @media (max-width:760px){ .ladder-step{border-right:none; border-bottom:1px solid var(--paper-line);} }
+  .ladder-num{font-family:'IBM Plex Mono',monospace; font-size:0.75rem; color:var(--clay); margin-bottom:14px;}
+  .ladder-step h3{font-size:1.3rem; font-weight:600; margin-bottom:6px;}
+  .ladder-step .sw{font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:#8a7f5f; margin-bottom:14px;}
+  .ladder-step p{font-size:0.92rem; color:#4a4436;}
+
+  /* ---------- FILE TABS (features) ---------- */
+  .filetabs{padding:96px 0;}
+  .tabbar{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:0; position:relative; z-index:2;}
+  .tab-btn{
+    padding:14px 22px; font-family:'IBM Plex Mono',monospace; font-size:0.82rem;
+    background:#EFE6CC; color:#7a715a; border:1px solid var(--paper-line); border-bottom:none;
+    border-radius:6px 6px 0 0; cursor:pointer; transition:all .15s;
+  }
+  .tab-btn.active{background:var(--board); color:var(--gold-bright); border-color:var(--board);}
+  .tab-panel{
+    display:none; border:1px solid var(--paper-line); border-radius:0 6px 6px 6px;
+    background:#fff; padding:44px; margin-top:-1px;
+  }
+  .tab-panel.active{display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center;}
+  @media (max-width:760px){ .tab-panel.active{grid-template-columns:1fr;} .tab-panel{padding:28px;} }
+  .tab-panel h3{font-size:1.5rem; font-weight:600; margin-bottom:12px;}
+  .tab-panel p{color:#4a4436; margin-bottom:18px; font-size:0.96rem;}
+  .tab-panel ul{list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .tab-panel li{font-size:0.88rem; display:flex; gap:10px; align-items:flex-start; color:#3a3528;}
+  .tab-panel li::before{content:'—'; color:var(--clay); flex-shrink:0;}
+  .tab-visual{
+    background:var(--paper); border:1px solid var(--paper-line); border-radius:6px; padding:22px;
+    font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:#4a4436;
+  }
+  .tab-visual .row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--paper-line);}
+  .tab-visual .row:last-child{border-bottom:none;}
+  .tag{padding:2px 8px; border-radius:10px; font-size:0.68rem; font-weight:600;}
+  .tag.ok{background:#e2f0eb; color:var(--teal);}
+  .tag.warn{background:#f7e6d8; color:var(--clay);}
+
+  /* ---------- TRUST STRIP ---------- */
+  .trust{background:var(--board); color:var(--cream); padding:56px 0;}
+  .trust-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:32px; text-align:center;}
+  @media (max-width:700px){ .trust-grid{grid-template-columns:repeat(2,1fr);} }
+  .trust-num{font-family:'Fraunces',serif; font-size:2.1rem; font-weight:700; color:var(--gold-bright);}
+  .trust-label{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:rgba(244,236,216,0.6); margin-top:6px; text-transform:uppercase; letter-spacing:0.05em;}
+
+  /* ---------- TESTIMONIAL ---------- */
+  .testimonial{padding:100px 0; text-align:center;}
+  .testimonial blockquote{
+    font-family:'Fraunces',serif; font-weight:500; font-style:italic;
+    font-size:clamp(1.3rem,2.6vw,1.85rem); max-width:26ch; margin:0 auto 26px; line-height:1.35;
+  }
+  .testi-who{font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:#8a7f5f;}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:linear-gradient(135deg,var(--clay),#8a3a22);
+    color:var(--cream); padding:80px 0; border-radius:8px; margin:0 32px 100px; max-width:1120px; margin-left:auto; margin-right:auto;
+    text-align:center;
+  }
+  .cta h2{font-size:clamp(1.7rem,3vw,2.4rem); margin-bottom:14px;}
+  .cta p{opacity:0.85; margin-bottom:30px; max-width:42ch; margin-left:auto; margin-right:auto;}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--board); color:rgba(244,236,216,0.65); padding:48px 0 32px; font-size:0.85rem;}
+  .foot-grid{display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-bottom:32px;}
+  .foot-grid a{opacity:0.9;}
+  footer .fine{border-top:1px solid rgba(244,236,216,0.15); padding-top:20px; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+  /* ---------- LOGIN MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(27,42,32,0.75); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .login-card{
+    background:var(--paper); border-radius:8px; max-width:400px; width:100%;
+    box-shadow:0 40px 80px -20px rgba(0,0,0,0.5); overflow:hidden;
+    animation:pop .2s ease;
+  }
+  @keyframes pop{from{transform:scale(0.96); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .login-head{background:var(--board); color:var(--cream); padding:26px 30px; position:relative;}
+  .login-head h3{font-size:1.3rem; font-weight:600;}
+  .login-head p{font-size:0.82rem; color:rgba(244,236,216,0.6); margin-top:4px; font-family:'IBM Plex Mono',monospace;}
+  .modal-close{position:absolute; top:18px; right:20px; background:none; border:none; color:var(--cream); font-size:1.3rem; cursor:pointer; opacity:0.7;}
+  .modal-close:hover{opacity:1;}
+  .login-body{padding:30px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block; font-size:0.78rem; font-weight:600; margin-bottom:7px; color:#4a4436;}
+  .field input{
+    width:100%; padding:11px 14px; border:1.5px solid var(--paper-line); border-radius:4px;
+    font-family:'Inter',sans-serif; font-size:0.92rem; background:#fff; color:var(--ink);
+  }
+  .field input:focus{border-color:var(--teal); outline:none;}
+  .role-hint{
+    background:#f2ecd9; border:1px dashed var(--paper-line); border-radius:4px; padding:10px 14px;
+    font-size:0.78rem; color:#7a715a; margin-bottom:20px; font-family:'IBM Plex Mono',monospace;
+  }
+  .login-submit{width:100%; justify-content:center; padding:13px;}
+  .login-foot{margin-top:18px; text-align:center; font-size:0.82rem; color:#8a7f5f;}
+  .login-foot a{color:var(--clay); font-weight:600;}
+
+  ::selection{background:var(--gold); color:var(--board);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark">TS</span> TSMS</div>
+    <div class="nav-links">
+      <a href="#academics" class="hide-mobile">Features</a>
+      <a href="#pricing" class="hide-mobile">Pricing</a>
+      <a href="#contact" class="hide-mobile">Contact</a>
+      <a href="#" class="btn btn-outline" id="openLogin">Login</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Built for Tanzanian schools</div>
+      <h1>Every student.<br>Every day.<br><em>On record.</em></h1>
+      <p class="lead">From Awali to Kidato cha Sita — one system for enrollment, attendance, grading, fees and report cards. No more three separate registers and a fee ledger in a notebook.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-gold">Request a demo</a>
+        <a href="#academics" class="btn btn-outline">See how it works ↓</a>
+      </div>
+      <div class="hero-note">v1.0 · Kiswahili &amp; English · Mobile money ready</div>
+    </div>
+
+    <div class="register-card" role="img" aria-label="Animated class register showing students being marked present">
+      <div class="register-head">
+        <span>FORM 2 BLUE — DAILY REGISTER</span>
+        <span id="regDate"></span>
+      </div>
+      <div class="register-list" id="regList">
+        <div class="reg-row"><div class="reg-check">✓</div><div class="reg-name">Amani Mwakalinga</div><div class="reg-status">—</div></div>
+        <div class="reg-row"><div class="reg-check">✓</div><div class="reg-name">Neema Kileo</div><div class="reg-status">—</div></div>
+        <div class="reg-row"><div class="reg-check">✓</div><div class="reg-name">Baraka Mushi</div><div class="reg-status">—</div></div>
+        <div class="reg-row"><div class="reg-check">✓</div><div class="reg-name">Fatuma Rajabu</div><div class="reg-status">—</div></div>
+        <div class="reg-row"><div class="reg-check">✓</div><div class="reg-name">Emmanuel Massawe</div><div class="reg-status">—</div></div>
+        <div class="reg-row"><div class="reg-check">✓</div><div class="reg-name">Zainab Hassan</div><div class="reg-status">—</div></div>
+      </div>
+      <div class="register-foot">
+        <span id="regCount">0 / 6 marked</span>
+        <span>32/34 present today</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="ladder wrap" id="academics">
+  <div class="section-head">
+    <div class="eyebrow">The full school ladder</div>
+    <h2>One system, from a child's first day to their final exam.</h2>
+  </div>
+  <div class="ladder-grid">
+    <div class="ladder-step">
+      <div class="ladder-num">01 — AGES 4–6</div>
+      <h3>Awali</h3>
+      <div class="sw">Pre-Unit / Kindergarten</div>
+      <p>Simple daily attendance, guardian contacts, and a gentle first record for every child before Standard One.</p>
+    </div>
+    <div class="ladder-step">
+      <div class="ladder-num">02 — STD 1–7</div>
+      <h3>Msingi</h3>
+      <div class="sw">Primary School</div>
+      <p>Class registers, CATs and exams, fee invoices, and report cards that carry a student through to PSLE.</p>
+    </div>
+    <div class="ladder-step">
+      <div class="ladder-num">03 — FORM 1–6</div>
+      <h3>Sekondari</h3>
+      <div class="sw">O-Level &amp; A-Level</div>
+      <p>Subject combinations, NECTA-style divisions, timetabling, and CSEE/ACSEE-ready result summaries.</p>
+    </div>
+  </div>
+</section>
+
+<section class="filetabs wrap" id="features">
+  <div class="section-head">
+    <div class="eyebrow">Open a file</div>
+    <h2>Everything the staff room needs, in one cabinet.</h2>
+  </div>
+  <div class="tabbar" role="tablist">
+    <button class="tab-btn active" data-tab="t1">Academics</button>
+    <button class="tab-btn" data-tab="t2">Attendance</button>
+    <button class="tab-btn" data-tab="t3">Fees</button>
+    <button class="tab-btn" data-tab="t4">Report Cards</button>
+  </div>
+
+  <div class="tab-panel active" id="t1">
+    <div>
+      <h3>Marks entry that adds up on its own</h3>
+      <p>Teachers enter raw marks per subject. TSMS computes grades, points and division automatically — the way NECTA marks Form 4 and Form 6 results.</p>
+      <ul>
+        <li>CATs, mid-terms and final exams, tracked per term</li>
+        <li>Configurable grading scale per education level</li>
+        <li>Automatic class ranking and subject averages</li>
+      </ul>
+    </div>
+    <div class="tab-visual">
+      <div class="row"><span>Mathematics</span><span>78 <span class="tag ok">A</span></span></div>
+      <div class="row"><span>Physics</span><span>64 <span class="tag ok">B</span></span></div>
+      <div class="row"><span>Chemistry</span><span>52 <span class="tag warn">C</span></span></div>
+      <div class="row"><span>Division</span><span>I (14 pts)</span></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="t2">
+    <div>
+      <h3>The morning register, digitized</h3>
+      <p>Class teachers mark present, absent, late or excused in under a minute. Parents see it the same day.</p>
+      <ul>
+        <li>One tap to mark the whole class present</li>
+        <li>SMS alert to a guardian when a child is absent</li>
+        <li>Monthly attendance percentage, per student</li>
+      </ul>
+    </div>
+    <div class="tab-visual">
+      <div class="row"><span>Amani M.</span><span class="tag ok">Present</span></div>
+      <div class="row"><span>Neema K.</span><span class="tag ok">Present</span></div>
+      <div class="row"><span>Baraka M.</span><span class="tag warn">Absent</span></div>
+      <div class="row"><span>Class average</span><span>94%</span></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="t3">
+    <div>
+      <h3>Fees, without the notebook ledger</h3>
+      <p>Invoices generate automatically each term. Parents pay by mobile money or bank control number, and see their balance instantly.</p>
+      <ul>
+        <li>Fee structures per class — tuition, boarding, meals, transport</li>
+        <li>Control-number and mobile money payment recording</li>
+        <li>Automatic SMS reminder before the due date</li>
+      </ul>
+    </div>
+    <div class="tab-visual">
+      <div class="row"><span>Term 2 Invoice</span><span>TZS 300,000</span></div>
+      <div class="row"><span>Paid</span><span>TZS 200,000</span></div>
+      <div class="row"><span>Balance</span><span class="tag warn">TZS 100,000</span></div>
+      <div class="row"><span>Due</span><span>12 Sep 2026</span></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="t4">
+    <div>
+      <h3>Report cards a parent actually understands</h3>
+      <p>One click produces a clean, printable termly or annual report — subject marks, grade, division, attendance and remarks.</p>
+      <ul>
+        <li>Termly and annual report cards, per student</li>
+        <li>Class-wide report generation for the whole school</li>
+        <li>Downloadable PDF, ready to print or share</li>
+      </ul>
+    </div>
+    <div class="tab-visual">
+      <div class="row"><span>Student</span><span>Neema Kileo</span></div>
+      <div class="row"><span>Term average</span><span>68.4%</span></div>
+      <div class="row"><span>Position</span><span>4 / 34</span></div>
+      <div class="row"><span>Status</span><span class="tag ok">Ready</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="trust">
+  <div class="wrap trust-grid">
+    <div><div class="trust-num">3</div><div class="trust-label">School levels, one system</div></div>
+    <div><div class="trust-num">100%</div><div class="trust-label">NECTA-aligned grading</div></div>
+    <div><div class="trust-num">24/7</div><div class="trust-label">Parent access to records</div></div>
+    <div><div class="trust-num">SMS</div><div class="trust-label">Fee &amp; attendance alerts</div></div>
+  </div>
+</section>
+
+<section class="testimonial wrap">
+  <blockquote>"For the first time, I can see every class's attendance and every parent's fee balance from one screen — before, that was three notebooks and a headache."</blockquote>
+  <div class="testi-who">— Head Teacher, secondary school, Dar es Salaam (pilot user)</div>
+</section>
+
+<section class="cta wrap" id="pricing">
+  <h2>Ready to see it running with your own classes?</h2>
+  <p>We'll set up a demo using your school's actual class structure — Awali through Kidato cha Sita.</p>
+  <a href="#contact" class="btn btn-gold">Request a demo</a>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="brand" style="color:var(--cream);"><span class="brand-mark">TS</span> TSMS</div>
+      <div style="display:flex; gap:28px; flex-wrap:wrap;">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#" id="openLogin2">Login</a>
+        <a href="mailto:hello@tsms.co.tz">hello@tsms.co.tz</a>
+      </div>
+    </div>
+    <div class="fine wrap" style="padding:0;">
+      <span>© 2026 TSMS — built for Tanzanian schools.</span>
+      <span>Kiswahili &amp; English</span>
+    </div>
+  </div>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-head">
+      <button class="modal-close" id="closeLogin" aria-label="Close login">×</button>
+      <h3>Sign in to TSMS</h3>
+      <p>Your dashboard depends on your role — admin, teacher, parent or student.</p>
+    </div>
+    <div class="login-body">
+      <div class="field">
+        <label for="loginId">Phone or email</label>
+        <input type="text" id="loginId" placeholder="+255 7XX XXX XXX">
+      </div>
+      <div class="field">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••">
+      </div>
+      <div class="role-hint">We'll detect your role automatically and take you straight to the right dashboard.</div>
+      <button class="btn btn-clay login-submit">Sign in</button>
+      <div class="login-foot">Forgot your password? <a href="#">Reset it</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Register roll-call animation
+  const rows = document.querySelectorAll('#regList .reg-row');
+  const counter = document.getElementById('regCount');
+  const dateEl = document.getElementById('regDate');
+  dateEl.textContent = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+
+  let i = 0;
+  function markNext(){
+    rows.forEach(r => { r.classList.remove('present'); r.querySelector('.reg-status').textContent = '—'; });
+    counter.textContent = '0 / ' + rows.length + ' marked';
+    i = 0;
+    const step = setInterval(() => {
+      if(i >= rows.length){ clearInterval(step); setTimeout(markNext, 2200); return; }
+      rows[i].classList.add('present');
+      rows[i].querySelector('.reg-status').textContent = 'Present';
+      i++;
+      counter.textContent = i + ' / ' + rows.length + ' marked';
+    }, 420);
+  }
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    markNext();
+  } else {
+    rows.forEach(r => { r.classList.add('present'); r.querySelector('.reg-status').textContent = 'Present'; });
+    counter.textContent = rows.length + ' / ' + rows.length + ' marked';
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Login modal
+  const overlay = document.getElementById('loginOverlay');
+  function openModal(e){ e.preventDefault(); overlay.classList.add('open'); }
+  document.getElementById('openLogin').addEventListener('click', openModal);
+  document.getElementById('openLogin2').addEventListener('click', openModal);
+  document.getElementById('closeLogin').addEventListener('click', () => overlay.classList.remove('open'));
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) overlay.classList.remove('open'); });
+</script>
+
+</body>
+</html>

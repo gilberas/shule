@@ -1,0 +1,1 @@
+ALTER TABLE education_levels CHANGE COLUMN `order` `display_order` INT(11) NOT NULL DEFAULT 0 AFTER name;
