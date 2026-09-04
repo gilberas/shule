@@ -20,6 +20,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->runningInConsole() === false) {
+            $req = request();
+            if ($req->header('host')) {
+                $host = $req->header('host');
+                $scheme = $req->secure() ? 'https' : 'http';
+                $url = $scheme . '://' . $host;
+                config(['app.url' => $url]);
+                \Illuminate\Support\Facades\URL::forceRootUrl($url);
+                if ($req->secure()) {
+                    \Illuminate\Support\Facades\URL::forceScheme('https');
+                }
+            }
+        }
+
         Livewire::component('manage-fees', \App\Livewire\ManageFees::class);
         Livewire::component('manage-students', \App\Livewire\ManageStudents::class);
         Livewire::component('manage-teachers', \App\Livewire\ManageTeachers::class);
