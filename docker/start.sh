@@ -14,8 +14,7 @@ php artisan config:clear 2>&1 || true
 # Run database migrations FIRST (before caching config)
 php artisan migrate --force 2>&1 || true
 
-# Cache config/routes/views for performance
-php artisan config:cache
+# Cache routes and views for performance (skip config:cache — it bakes stale APP_URL)
 php artisan route:cache
 php artisan view:cache
 
