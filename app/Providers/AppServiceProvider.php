@@ -22,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole() === false) {
             $req = request();
-            if ($req->header('host')) {
-                $host = $req->header('host');
+            $host = $req->header('x-forwarded-host') ?: $req->header('host');
+            if ($host) {
                 $scheme = $req->secure() ? 'https' : 'http';
                 $url = $scheme . '://' . $host;
                 config(['app.url' => $url]);
