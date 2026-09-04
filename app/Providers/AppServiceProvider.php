@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -33,6 +34,13 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
         }
+
+        Blade::directive('relvite', function (string $expression) {
+            return "<?php
+                \$__viteHtml = app(\Illuminate\Foundation\Vite::class)->content({$expression});
+                echo preg_replace('#https?://[^/]+/build/#', '/build/', \$__viteHtml);
+            ?>";
+        });
 
         Livewire::component('manage-fees', \App\Livewire\ManageFees::class);
         Livewire::component('manage-students', \App\Livewire\ManageStudents::class);
